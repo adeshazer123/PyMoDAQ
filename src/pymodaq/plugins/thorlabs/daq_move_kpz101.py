@@ -74,9 +74,9 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
         self.controller.EnableDevice()
         time.sleep(0.25) 
 
-        device_config = self.controller.GetPiezoConfiguration(serial_number)
+        # device_config = self.controller.GetPiezoConfiguration(serial_number)
 
-        device_settings = self.controller.PiezoDeviceSettings
+        # device_settings = self.controller.PiezoDeviceSettings
 
     def get_voltage_value(self):
         """Get the current value from the hardware with scaling conversion.
@@ -92,8 +92,6 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
     def close(self):
         """Terminate the communication protocol"""
         self.controller.disconnect()
-        ## TODO for your custom plugin
-        raise NotImplemented  # when writing your own plugin remove this line
         #  self.controller.your_method_to_terminate_the_communication()  # when writing your own plugin replace this line
 
     def commit_settings(self, param: Parameter):
@@ -105,13 +103,14 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
             A given parameter (within detector_settings) whose value has been changed by the user
         """
         if param.name() == "voltage":
-           voltage = Decimal(voltage)
-    
-        min_volt = System.Decimal(0)
-        max_volt = self.controller.GetMaxOutputVoltage()
-        if voltage != min_volt and voltage <= max_volt:
-            self.device.SetOutputVoltage(voltage)
-            time.sleep(1.0)
+            voltage = Decimal(voltage)
+            min_volt = System.Decimal(0)
+            max_volt = self.controller.GetMaxOutputVoltage()
+            if voltage != min_volt and voltage <= max_volt:
+                self.device.SetOutputVoltage(voltage)
+                time.sleep(1.0)
+            else:
+                self.emit_status(ThreadCommand('Update_Status', ['Voltage out of range']))     
         else:
             pass
 
